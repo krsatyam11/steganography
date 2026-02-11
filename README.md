@@ -1,4 +1,4 @@
-# 🕵️‍♂️ Steganography Tool (v1.0.0)
+# 🕵️‍♂️ Steganography Tool (v1.1.0)
 
 ![React](https://img.shields.io/badge/React-18-blue?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
@@ -8,7 +8,7 @@
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
 > 🔐 **A high-performance Client-Side Steganography Suite.**
-> Securely hide secret messages inside images using LSB (Least Significant Bit) encoding, wrapped in a professional "Cyber-Hacker" aesthetic.
+> Securely hide secret messages inside images using LSB (Least Significant Bit) encoding, wrapped in a professional "Cyber-Hacker" aesthetic. Now supports high-resolution images up to **20MB**.
 
 ---
 
@@ -19,15 +19,16 @@
 
 ---
 
-## 🧠 Key Features
+## 🧠 Key Features (v1.1)
 
 *   **🎨 Cyber-Professional UI:** A sleek, forced dark-mode interface with glassmorphism, neon accents, and CRT-style terminal effects designed for privacy enthusiasts.
 *   **🔒 Client-Side Privacy:** All processing happens **100% in your browser**. Images and messages are never uploaded to any server.
-*   **🖼️ LSB Algorithm:** Utilizes **Least Significant Bit** manipulation to embed binary data into the RGB channels of pixels without noticeable visual distortion.
-*   **⚡ Real-Time Calculation:**
-    *   **Capacity Meter:** Instantly calculates how many characters you can hide based on image dimensions.
-    *   **Safety Checks:** Prevents data corruption by enforcing file size limits (5MB) and format validation.
-*   **💾 Lossless Output:** Generates PNG images to prevent compression artifacts from destroying your hidden message.
+*   **📸 High-Res Support:** Now supports images up to **20MB**. Optimized for modern smartphone cameras and high-quality photography.
+*   **📱 Mobile Optimized:** Improved file picker compatibility for Android/iOS file managers.
+*   **⚡ Smart Controls:**
+    *   **Dynamic Capacity:** Real-time character limit calculation based on image pixels.
+    *   **Quick Clear:** One-click reset buttons to scrub data and start over.
+*   **📚 Educational Context:** Includes technical breakdowns of LSB logic and information on Audio Steganography.
 
 ---
 
@@ -40,12 +41,12 @@ steganography/
 │   ├── components/
 │   │   ├── ui/              # Reusable Shadcn-style components
 │   │   ├── Navbar.tsx       # Navigation with smooth scroll
-│   │   ├── EncoderTab.tsx   # Encryption/Hiding Logic
+│   │   ├── EncoderTab.tsx   # Encryption/Hiding Logic (20MB Limit)
 │   │   ├── DecoderTab.tsx   # Decryption/Extracting Logic
 │   │   └── Footer.tsx       # Author & Socials
 │   ├── lib/
 │   │   └── steganography.ts # Core LSB Algorithm (The "Brain")
-│   ├── App.tsx              # Main Layout
+│   ├── App.tsx              # Main Layout & Educational Content
 │   ├── main.tsx
 │   └── index.css            # Tailwind, Animations & Cyber Grids
 │
@@ -91,10 +92,11 @@ Open in browser: `http://localhost:5173`
 
 | Component | Explanation |
 | :--- | :--- |
-| **Concept** | Least Significant Bit (LSB) Steganography. |
+| **Concept** | **Least Significant Bit (LSB)** Steganography. |
 | **Process** | Every pixel has RGB values (e.g., `255, 0, 0`). We convert your message to binary and replace the last bit of these values. |
 | **Stealth** | Changing a color value from `254` to `255` is invisible to the human eye. |
 | **Capacity** | `(Width * Height * 3) / 8` bytes. Roughly 1 character per 3 pixels. |
+| **Audio Note** | Similar techniques exist for audio (MP3/WAV), hiding data in frequencies humans cannot hear (>20kHz). |
 | **Fragility** | **Note:** This method is fragile to compression. Always save/share as **PNG** or **File**, never as a compressed JPG (like on WhatsApp). |
 
 ---
@@ -102,7 +104,7 @@ Open in browser: `http://localhost:5173`
 ## 💾 How to Use
 
 ### 1. Encode (Hide Message)
-1.  Upload a carrier image (PNG or JPG).
+1.  Upload a carrier image (PNG or JPG) up to **20MB**.
 2.  Type your secret message in the terminal input.
 3.  Watch the capacity meter to ensure it fits.
 4.  Click **ENCODE MESSAGE**.

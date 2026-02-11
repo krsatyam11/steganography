@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Upload, Eye, Copy, AlertCircle } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Upload, Eye, Copy, AlertCircle, X } from 'lucide-react';
 import { Card, NeonButton, cn } from './ui/Layout';
 import { decodeMessage } from '../lib/steganography';
 
@@ -9,6 +9,7 @@ const DecoderTab = () => {
   const [decodedMessage, setDecodedMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -25,6 +26,16 @@ const DecoderTab = () => {
         setPreviewUrl(event.target?.result as string);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setImage(null);
+    setPreviewUrl(null);
+    setDecodedMessage(null);
+    setError(null);
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
     }
   };
 
@@ -61,15 +72,32 @@ const DecoderTab = () => {
       <div className="max-w-3xl mx-auto space-y-8">
         
         {/* Upload */}
-        <Card className="p-8 border-dashed border-2 hover:border-purple-500/50 cursor-pointer relative group text-center">
-            <input 
-            type="file" 
-            accept="image/png" 
-            onChange={handleImageUpload}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            />
+        <Card className={cn(
+            "p-8 border-dashed border-2 relative group text-center transition-colors",
+            previewUrl ? "border-purple-500/50 bg-purple-500/5" : "hover:border-purple-500/50 cursor-pointer"
+        )}>
+            {!previewUrl && (
+                <input 
+                ref={fileInputRef}
+                type="file" 
+                accept="image/png, image/jpeg, image/jpg" 
+                onChange={handleImageUpload}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+            )}
+            
             {previewUrl ? (
-                <img src={previewUrl} alt="Stego Preview" className="max-h-64 mx-auto rounded border border-border shadow-lg" />
+                <div className="relative inline-block">
+                    <img src={previewUrl} alt="Stego Preview" className="max-h-64 mx-auto rounded border border-border shadow-lg" />
+                     {/* Clear Button */}
+                     <button 
+                      onClick={clearImage}
+                      className="absolute -top-3 -right-3 bg-destructive text-white p-2 rounded-full hover:bg-red-600 transition-colors shadow-lg z-20"
+                      title="Clear Image"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                </div>
             ) : (
                 <div className="py-8">
                     <Upload className="h-12 w-12 mx-auto text-muted-foreground group-hover:text-purple-500 transition-colors" />

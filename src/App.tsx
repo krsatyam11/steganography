@@ -3,7 +3,7 @@ import Navbar from './components/Navbar';
 import EncoderTab from './components/EncoderTab';
 import DecoderTab from './components/DecoderTab';
 import { Card } from './components/ui/Layout';
-import { Lock, Image as ImageIcon, Download, Eye, Github, Linkedin, Youtube, Mail, Instagram } from 'lucide-react';
+import { Lock, Image as ImageIcon, Download, Eye, Github, Linkedin, Youtube, Mail, Instagram, ExternalLink, Music } from 'lucide-react';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'encode' | 'decode'>('encode');
@@ -83,23 +83,33 @@ function App() {
           </div>
         </section>
 
-        {/* The Science Behind It - Renamed & Simplified */}
+        {/* The Science & Audio Steganography */}
         <section className="mb-20">
           <Card className="p-8 border-l-4 border-l-cyan-500 bg-zinc-950/80 shadow-2xl">
-            <h3 className="text-xl font-mono font-bold text-white mb-4">The Science Behind It</h3>
-            <div className="grid md:grid-cols-2 gap-8">
+            <h3 className="text-xl font-mono font-bold text-white mb-6">The Science Behind It</h3>
+            
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
               <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
                 <p>
                   <strong className="text-white">Digital Magic (LSB):</strong> 
                   Every image is made of millions of pixels. Each pixel has numbers that define its color (Red, Green, Blue).
+                  This tool tweaks the "Least Significant" numbers of those pixels.
                 </p>
                 <p>
-                  This tool slightly tweaks the "Least Significant" numbers of those pixels to store your message letter by letter. Because the change is so tiny (like changing a color value from 254 to 255), the human eye cannot see the difference at all.
+                  Because the change is so tiny (like changing a color value from 254 to 255), the human eye cannot see the difference.
                 </p>
-                <p className="text-xs opacity-70 italic mt-2">
-                  *Note: This is fragile! If you compress the image (like sending it on WhatsApp), the hidden data might get lost. Always send as a "File" or "Document".
-                </p>
+                <div className="pt-2">
+                    <a 
+                        href="https://en.wikipedia.org/wiki/Steganography" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-cyan-500 hover:text-cyan-400 hover:underline transition-colors text-xs font-mono"
+                    >
+                        Learn more on Wikipedia <ExternalLink className="h-3 w-3" />
+                    </a>
+                </div>
               </div>
+              
               <div className="bg-black/50 p-4 rounded border border-border overflow-x-auto flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-xs font-mono text-gray-500 mb-2">Visual Representation</div>
@@ -108,13 +118,27 @@ function App() {
                         <span className="text-gray-500 self-center">≈</span>
                         <div className="w-8 h-8 bg-[rgb(254,0,0)] rounded" title="Modified Red (Hidden Data)"></div>
                     </div>
-                    {/* FIXED: Replaced "<-" with "←" to prevent JSX error */}
                     <p className="text-xs text-green-400 font-mono">
                         Red: 255 (11111111) <br/> 
                         Red: 254 (11111110) ← Data Hidden
                     </p>
                 </div>
               </div>
+            </div>
+
+            {/* Audio Steganography Info */}
+            <div className="border-t border-border pt-6 mt-6">
+                <div className="flex items-start gap-3">
+                    <Music className="h-6 w-6 text-purple-500 mt-1 shrink-0" />
+                    <div>
+                        <h4 className="text-white font-mono font-bold mb-2">Did you know? Audio can hide secrets too.</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                            Similar to images, **Audio Steganography** hides data in sound files (WAV, MP3). 
+                            It works by modifying the amplitude of sound samples slightly or embedding data in frequencies humans cannot hear (above 20kHz).
+                            While this tool focuses on images, the concept of "hiding in plain sight" remains the same across digital media.
+                        </p>
+                    </div>
+                </div>
             </div>
           </Card>
         </section>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Upload, Download, AlertTriangle, Cpu } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Upload, Download, AlertTriangle, Cpu, X, Trash2 } from 'lucide-react';
 import { Card, NeonButton, cn } from './ui/Layout';
 import { encodeMessage, calculateCapacity } from '../lib/steganography';
 
@@ -11,20 +11,18 @@ const EncoderTab = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [capacity, setCapacity] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Set explicit limit
-  const MAX_FILE_SIZE_MB = 5;
+  // Updated Limit: 20MB
+  const MAX_FILE_SIZE_MB = 20;
   const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Security: Check file size
       if (file.size > MAX_FILE_SIZE_BYTES) {
-        setError(`File is too large! Please upload an image smaller than ${MAX_FILE_SIZE_MB}MB.`);
-        // Reset image if invalid
-        setImage(null);
-        setPreviewUrl(null);
+        setError(`File is too large! Max limit is ${MAX_FILE_SIZE_MB}MB.`);
+        clearImage();
         return;
       }
       
@@ -44,13 +42,24 @@ const EncoderTab = () => {
     }
   };
 
+  const clearImage = () => {
+    setImage(null);
+    setPreviewUrl(null);
+    setEncodedUrl(null);
+    setCapacity(0);
+    setMessage('');
+    setError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleEncode = async () => {
     if (!image || !message) return;
     setIsProcessing(true);
     setError(null);
 
     try {
-      // Simulate processing delay for "hacker" effect
       setTimeout(async () => {
         try {
           const result = await encodeMessage(image, message);
@@ -72,16 +81,36 @@ const EncoderTab = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Input Section */}
         <div className="space-y-6">
-          <Card className="p-6 border-dashed border-2 hover:border-cyan-500/50 cursor-pointer relative group transition-colors">
-             <input 
-                type="file" 
-                accept="image/png, image/jpeg" 
-                onChange={handleImageUpload}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-             />
+          <Card className={cn(
+            "p-6 border-dashed border-2 relative group transition-colors",
+            previewUrl ? "border-cyan-500/50 bg-cyan-500/5" : "hover:border-cyan-500/50 cursor-pointer"
+          )}>
+             {!previewUrl && (
+                <input 
+                  ref={fileInputRef}
+                  type="file" 
+                  accept="image/png, image/jpeg, image/jpg" 
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+             )}
+             
              <div className="text-center py-8">
                 {previewUrl ? (
-                  <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto rounded border border-border" />
+                  <div className="relative inline-block">
+                    <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto rounded border border-cyan-500/50 shadow-lg" />
+                    {/* Clear Button */}
+                    <button 
+                      onClick={clearImage}
+                      className="absolute -top-3 -right-3 bg-destructive text-white p-2 rounded-full hover:bg-red-600 transition-colors shadow-lg z-20"
+                      title="Clear Image"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <div className="mt-2 text-xs font-mono text-cyan-500">
+                        {image ? `${image.width}x${image.height}px` : ''}
+                    </div>
+                  </div>
                 ) : (
                   <>
                     <Upload className="h-12 w-12 mx-auto text-muted-foreground group-hover:text-cyan-500 transition-colors" />
@@ -98,16 +127,20 @@ const EncoderTab = () => {
             <div className="flex justify-between text-xs font-mono text-muted-foreground">
               <span>SECRET MESSAGE</span>
               <span className={cn(message.length > capacity ? "text-red-500" : "text-cyan-500")}>
-                {message.length} / {capacity > 0 ? capacity : '0'} chars
+                {message.length} / {capacity > 0 ? capacity.toLocaleString() : '0'} chars
               </span>
             </div>
             <textarea 
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Enter the secret message you want to hide..."
-              className="w-full bg-black/50 border border-border rounded-lg p-4 font-mono text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none min-h-[150px] resize-none placeholder:text-muted-foreground/40"
+              placeholder={capacity > 0 ? "Enter your secret message here..." : "Upload an image first to enable typing..."}
+              maxLength={capacity > 0 ? capacity : 0}
+              className="w-full bg-black/50 border border-border rounded-lg p-4 font-mono text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none min-h-[150px] resize-none placeholder:text-muted-foreground/40 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!image}
             />
+            {capacity > 0 && message.length >= capacity && (
+                <p className="text-xs text-red-500 font-mono">Maximum character limit reached for this image size.</p>
+            )}
           </div>
 
           <NeonButton 
@@ -141,7 +174,7 @@ const EncoderTab = () => {
 
              {!isProcessing && encodedUrl && (
                <div className="w-full space-y-6 text-center animate-fade-in-up">
-                 <div className="relative group">
+                 <div className="relative group inline-block">
                    <img src={encodedUrl} alt="Encoded" className="max-h-64 mx-auto rounded border border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.15)]" />
                    <div className="absolute top-2 right-2">
                      <span className="bg-black/80 text-cyan-500 text-xs px-2 py-1 rounded font-mono border border-cyan-500/30">ENCODED</span>
@@ -163,6 +196,13 @@ const EncoderTab = () => {
                    <Download className="h-4 w-4" />
                    DOWNLOAD IMAGE
                  </a>
+                 
+                 <button 
+                    onClick={clearImage}
+                    className="block w-full text-center text-xs text-muted-foreground hover:text-white mt-2 underline"
+                 >
+                    Start Over
+                 </button>
                </div>
              )}
 
